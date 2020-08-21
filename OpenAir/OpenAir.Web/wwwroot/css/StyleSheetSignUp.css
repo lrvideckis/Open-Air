@@ -1,0 +1,54 @@
+﻿#message {
+    display: none;
+    background: #f1f1f1;
+    color: #000;
+    margin-top: 10px;
+}
+
+#message p {
+    font-size: 18px;
+}
+
+h2#SignUpHeading {
+    text-align: center;
+}
+
+form#SignUpFields {
+    text-align: center;
+}
+
+input#fname, input#lname, input#pwd, input#reenterpwd {
+    width: 148px;
+}
+
+input#email, input#aircraft {
+    width: 300px;
+}
+
+/* The message box is shown when the user clicks on the password field */
+#message {
+    display: none;
+    background: #f1f1f1;
+    color: #000;
+    margin-top: 10px;
+}
+
+/* Add a green text color and a checkmark when the requirements are right */
+.valid {
+    color: green;
+}
+
+.valid:before {
+    left: -35px;
+    content: "✔";
+}
+
+/* Add a red text color and an "x" when the requirements are wrong */
+.invalid {
+    color: red;
+}
+
+.invalid:before {
+    left: -35px;
+    content: "✖";
+}

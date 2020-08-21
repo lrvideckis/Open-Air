@@ -1,0 +1,11 @@
+﻿table#ScheduleTable, tr#ScheduleTable, td#ScheduleTable {
+    border: 1px solid black;
+    border-collapse: collapse;
+    line-height: 40px;
+    text-align: center;
+}
+
+table#ScheduleTable {
+    width: 100%;
+    margin: auto;
+}

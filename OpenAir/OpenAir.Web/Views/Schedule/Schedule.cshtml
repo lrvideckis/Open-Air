@@ -1,0 +1,140 @@
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+    <link rel="stylesheet" type="text/css" href="~/css/StyleSheetScheduleFlight.css">
+    <link rel="stylesheet" type="text/css" href="~/css/StyleSheetFlightForm.css">
+
+    @if (Context.Session.GetInt32("isAdmin") == 1)
+    {
+        <h2>Schedule Flight for a Pilot</h2>
+    }
+    else
+    {
+        <h2>Schedule Flight</h2>
+    }
+    <hr>
+    <br>
+
+    <center>
+        <form method="post">
+            Selected Date:
+            <input id="ScheduleID" type="date" name="currentDate" onchange="updateDay(this.value, '@ViewBag.email')" value=@ViewBag.dateSelected.ToString("yyyy-MM-dd")>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;Selected Route:
+            <select id="RouteList" onchange="updateRoute(this.value, '@ViewBag.email')">
+                @foreach (var route in ViewBag.RouteListRaw)
+                {
+                    if (route.RouteId == ViewBag.RouteSelected)
+                    {
+                        <option selected value=@route.RouteId>@route.RouteId</option>
+                    }
+                    else
+                    {
+                        <option value=@route.RouteId>@route.RouteId</option>
+                    }
+                }
+            </select>
+
+            <script src="~/js/ScheduleFlightPopup.js"></script>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <label for="callsign">CallSign:</label>
+
+            <input type="text" id="callsign" name="callsign" autocomplete="on"><br><br>
+            @if (Context.Session.GetInt32("isAdmin") == 1)
+            {
+                <label>
+                    Pilot email:
+                    <input list="pilots" name="pilotList" id="pilotList" value="@ViewBag.email" />
+                </label>
+
+
+                <datalist id="pilots">
+                    @foreach (var email in ViewBag.PilotList)
+                    {
+                        <option value="@email" />
+                    }
+                </datalist>
+
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+                <script>
+                    $(document).on('change', 'input', function () {
+                        var options = $('datalist')[0].options;
+                        for (var i = 0; i < options.length; i++) {
+                            if (options[i].value == $(this).val()) {
+                                var DateValue = document.getElementById('ScheduleID').value;
+                                var RouteValue = document.getElementById('RouteList').value;
+                                window.location.href = '/Schedule/UpdateScheduleViewFlights?currentDate=' + DateValue + "&Route=" + RouteValue + "&email=" + $(this).val();
+                                break;
+                            }
+                        }
+                    });
+                </script>
+            }
+
+
+            @if (ViewBag.scheduleStatus == "fail")
+            {
+                <p><font color="red">The current flight time and route is conflicting with another flight.</font></p>
+            }
+            <table id="ScheduleTable" style="width:60%;">
+                @for (var i = 7; i < 20; i++)
+                {
+                    <tr id="ScheduleTable">
+                        <td id="ScheduleTable" width="10%">
+                            @(((i + 11) % 12) + 1) @(i > 11 ? "PM" : "AM")
+                        </td>
+                        <td id="ScheduleTable">
+                            @{
+                                var curDate = ViewBag.dateSelected;
+                                var min_time = new DateTime(curDate.Year, curDate.Month, curDate.Day, i, 0, 0);
+                                var max_time = new DateTime(curDate.Year, curDate.Month, curDate.Day, i, 59, 59);
+                            }
+
+                            @foreach (var flight in ViewBag.Flights)//for each flight in the model
+                            {
+                                /*check if flight time and end time are in range (right now end time is set to start
+                                time + 10 minutes) */
+                                if (min_time <= flight.TimeOfFlight && flight.TimeOfFlight <= max_time)
+                                {
+                                    <div>
+                                        @flight.TimeOfFlight.ToString("hh:mm tt") - @flight.TimeOfFlight.AddMinutes(10).ToString("hh:mm tt")
+                                    </div>
+                                }
+                            }
+
+                            @{
+                                var closeFormID = "closeForm" + i.ToString();
+                                var openFormID = "openForm" + i.ToString();
+                                var minutesName = "minutes" + i;
+                                var flightSpeedName = "flightSpeed" + i;
+                            }
+                            <div class="form-popup" id=@closeFormID>
+                                <div class="form-container">
+                                    <b>Start Time&nbsp;</b>
+                                    <input type="text" value="@(((i + 11) % 12) + 1)" style="width: 40px; text-align: center" readonly>
+                                    <b>:</b>
+                                    <input type="text" id=@minutesName name=@minutesName placeholder="minutes" style="width: 70px">
+                                    @(i > 11 ? "PM" : "AM")
+
+                                    <br>
+
+                                    <b>Flight Speed (knots)&nbsp;</b>
+                                    <input type="text" id=@flightSpeedName name=@flightSpeedName>
+
+                                    <input onclick="addAFlight('@i','@ViewBag.email')" class="btn" value="Add a Flight">
+                                    <button type="button" class="btn cancel" onclick="closeForm('@closeFormID','@openFormID','@minutesName')">Close</button>
+                                </div>
+                            </div>
+
+                            <button id=@openFormID type="Button" class="open-button" onclick="openForm('@closeFormID','@openFormID')">Schedule</button>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </form>
+    </center>
+</body>
+</html >

@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="~/css/StyleSheetSignUp.css">
+</head>
+<body>
+    <h2 id="SignUpHeading">Sign Up</h2>
+    <br>
+    <div class="container" id="SignUpContainer">
+        <form id="SignUpFields" method="post">
+            <input type="text" id="fname" name="fname" placeholder="First name" required>
+            <input type="text" id="lname" name="lname" placeholder="Last name" required><br><br>
+            @if (ViewBag.SignUpStatus == "duplicateEmail")
+            {
+                <p><font color="red">Email already exists.</font></p>
+            }
+            <input type="text" id="email" name="email" placeholder="Email" required><br><br>
+            <input type="text" id="aircraft" name="aircraft" placeholder="Aircraft" required><br><br>
+            @if (ViewBag.SignUpStatus == "passwordsUnmatching")
+            {
+                <p><font color="red">Passwords don't match.</font></p>
+            }
+            <input type="password"
+                   id="pwd"
+                   name="pwd"
+                   placeholder="Password"
+                   pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                   title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+                   required>
+            <input type="password" id="reenterpwd" name="reenterpwd" placeholder="Re-enter Password" required><br><br>
+
+            <input id="SignUpSubmit" asp-area="" asp-controller="SignUp" asp-action="SignUpSubmit" type="submit" value="Submit">
+        </form>
+    </div>
+
+    <div id="message">
+        <h3>Password must contain the following:</h3>
+        <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+        <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+        <p id="number" class="invalid">A <b>number</b></p>
+        <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+    </div>
+    <script src="~/js/SignUpPwdFilter.js"></script>
+</body>
+</html>

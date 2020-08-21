@@ -1,0 +1,40 @@
+﻿
+<!DOCTYPE html>
+<style>
+    form {
+        display: inline;
+    }
+</style>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+</head>
+<body>
+
+    <center>
+        <h2>Login</h2>
+        <br />
+        <div>
+            @if (ViewBag.UserLoginStatus == "failed")
+            {
+                <p><font color="red">Username or password is incorrect.</font></p>
+            }
+            <form method="post">
+                <input type="text" name="email" placeholder="Email Address" style="width: 300px;" required><br><br>
+                <input type="password" name="pwd" placeholder="Password" style="width: 300px;" required><br><br>
+
+                <input asp-area="" asp-controller="Login" asp-action="LoginSubmit" type="submit" value="Log In">
+            </form>
+            <form method="post">
+                <input asp-area="" asp-controller="SignUp" asp-action="SignUp" type="submit" value="Create an Account">
+            </form>
+        </div>
+    </center>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>
+</html>

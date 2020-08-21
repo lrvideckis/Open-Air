@@ -1,0 +1,117 @@
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>My Flights</title>
+</head>
+<body>
+    <link rel="stylesheet" type="text/css" href="~/css/StyleSheetMyFlights.css">
+    <link rel="stylesheet" type="text/css" href="~/css/StyleSheetFlightForm.css">
+    @if (Context.Session.GetInt32("isAdmin") == 1)
+    {
+        <h2>All Flights</h2>
+    }
+    else
+    {
+        <h2>My Flights</h2>
+    }
+    <hr>
+
+    @if (Context.Session.GetInt32("isAdmin") == 1)
+    {
+        <label>
+            Pilot email:
+            <input list="pilots" name="pilotList" id="pilotList" value="@ViewBag.email" />
+        </label>
+
+
+        <datalist id="pilots">
+            @foreach (var email in ViewBag.PilotList)
+            {
+                <option value="@email" />
+            }
+        </datalist>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script>
+            $(document).on('change', 'input', function () {
+                var options = $('datalist')[0].options;
+                for (var i = 0; i < options.length; i++) {
+                    if (options[i].value == $(this).val()) {
+                        window.location.href = '/Flights/Flights?email=' + $(this).val();
+                        break;
+                    }
+                }
+            });
+        </script>
+    }
+
+    <br id="FlightTable">
+    <table id="FlightTable" style="border: none">
+        <tr id="FlightTable">
+            <th id="FlightTable">Date</th>
+            <th id="FlightTable">Time</th>
+            <th id="FlightTable">Route</th>
+        </tr>
+
+        @{
+            var i = 0;
+        }
+
+        @foreach (var flight in ViewBag.Flights)
+        {
+            <tr id="FlightTable">
+                <td id="FlightTable" style="border: 1px solid;">
+                    @flight.TimeOfFlight.ToString("MM/dd/yyyy")
+                </td>
+                <td id="FlightTable" style="border: 1px solid;">
+                    @flight.TimeOfFlight.ToString("h:mm tt")
+                </td>
+                <td id="FlightTable" style="border: 1px solid;">
+                    @flight.RouteId
+                </td>
+                <td id="FlightTable" style="border: none;">
+                    @{
+                        var closeFormID = "closeForm" + i.ToString();
+                        var openFormID = "openForm" + i.ToString();
+                        var scheduleId = "scheduleId" + i.ToString();
+                        var timeId = "timeId" + i.ToString();
+                        var routeId = "routeId" + i.ToString();
+                    }
+                    <button id=@openFormID
+                            type="Button"
+                            class="open-button"
+                            onclick="openForm('@closeFormID','@openFormID','@ViewBag.Flights.Count')">
+                        Modify
+                    </button>
+                    <div class="form-popup" id=@closeFormID>
+                        <div class="form-container">
+                            <input id=@scheduleId type="date" value=@flight.TimeOfFlight.ToString("yyyy-MM-dd")>
+                            <input id=@timeId type="time" value=@flight.TimeOfFlight.ToString("HH:mm")>
+
+                            @{
+                                foreach (var route in ViewBag.RouteList)
+                                {
+                                    if (route.Value == flight.RouteId)
+                                    {
+                                        route.Selected = true;
+                                    }
+                                }
+                            }
+                            @Html.DropDownList("RouteList", null, new { @id = @routeId })
+                            <input onclick="modifyFlight('@i', '@flight.TimeOfFlight', '@flight.RouteId', '@ViewBag.email')" class="btn" value="Modify this Flight">
+                            <button type="button" class="btn cancel" onclick="closeForm('@closeFormID','@openFormID')">Close</button>
+                        </div>
+                    </div>
+                    <input onclick="deleteFlight('@flight.TimeOfFlight', '@flight.RouteId', '@ViewBag.email')" type="submit" value="Delete">
+                </td>
+            </tr>
+            i = i + 1;
+        }
+
+    </table>
+
+    <script src="~/js/MyFlightsPopup.js"></script>
+</body>
+</html>
